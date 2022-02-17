@@ -1,0 +1,195 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: "2021-11-16T14:40:43Z"
+  generateName: gatekeeper-audit-74cd7c4844-
+  labels:
+    control-plane: audit-controller
+    gatekeeper.sh/operation: audit
+    gatekeeper.sh/system: "yes"
+    pod-template-hash: 74cd7c4844
+  name: gatekeeper-audit-74cd7c4844-7qp59
+  namespace: gatekeeper-system
+  ownerReferences:
+  - apiVersion: apps/v1
+    blockOwnerDeletion: true
+    controller: true
+    kind: ReplicaSet
+    name: gatekeeper-audit-74cd7c4844
+    uid: 393b6ad0-bf2d-4ced-911c-aedabee5bb7b
+  resourceVersion: "6559"
+  uid: f897f9d4-01e9-4f59-9941-4af5e204ff65
+spec:
+  affinity:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+      - podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+            - key: gatekeeper.sh/operation
+              operator: In
+              values:
+              - webhook
+          topologyKey: kubernetes.io/hostname
+        weight: 100
+  containers:
+  - args:
+    - --operation=audit
+    - --operation=status
+    - --logtostderr
+    - --audit-interval=600
+    - --constraint-violations-limit=500
+    - --audit-from-cache=false
+    command:
+    - /manager
+    env:
+    - name: POD_NAMESPACE
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: metadata.namespace
+    - name: POD_NAME
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: metadata.name
+    image: mcr.microsoft.com/oss/open-policy-agent/gatekeeper:v3.2.3
+    imagePullPolicy: Always
+    livenessProbe:
+      failureThreshold: 3
+      httpGet:
+        path: /healthz
+        port: 9090
+        scheme: HTTP
+      periodSeconds: 10
+      successThreshold: 1
+      timeoutSeconds: 1
+    name: manager
+    ports:
+    - containerPort: 8888
+      name: metrics
+      protocol: TCP
+    - containerPort: 9090
+      name: healthz
+      protocol: TCP
+    readinessProbe:
+      failureThreshold: 3
+      httpGet:
+        path: /readyz
+        port: 9090
+        scheme: HTTP
+      periodSeconds: 10
+      successThreshold: 1
+      timeoutSeconds: 1
+    resources:
+      limits:
+        cpu: "3"
+        memory: 1Gi
+      requests:
+        cpu: 100m
+        memory: 256Mi
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - all
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-grgm6
+      readOnly: true
+  dnsPolicy: ClusterFirst
+  enableServiceLinks: true
+  nodeName: minikube
+  nodeSelector:
+    kubernetes.io/os: linux
+  preemptionPolicy: PreemptLowerPriority
+  priority: 0
+  restartPolicy: Always
+  schedulerName: default-scheduler
+  securityContext: {}
+  serviceAccount: gatekeeper-admin
+  serviceAccountName: gatekeeper-admin
+  terminationGracePeriodSeconds: 60
+  tolerations:
+  - effect: NoExecute
+    key: node.kubernetes.io/not-ready
+    operator: Exists
+    tolerationSeconds: 300
+  - effect: NoExecute
+    key: node.kubernetes.io/unreachable
+    operator: Exists
+    tolerationSeconds: 300
+  volumes:
+  - name: kube-api-access-grgm6
+    projected:
+      defaultMode: 420
+      sources:
+      - serviceAccountToken:
+          expirationSeconds: 3607
+          path: token
+      - configMap:
+          items:
+          - key: ca.crt
+            path: ca.crt
+          name: kube-root-ca.crt
+      - downwardAPI:
+          items:
+          - fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+            path: namespace
+status:
+  conditions:
+  - lastProbeTime: null
+    lastTransitionTime: "2021-11-16T14:40:43Z"
+    status: "True"
+    type: Initialized
+  - lastProbeTime: null
+    lastTransitionTime: "2021-11-16T14:40:43Z"
+    message: 'containers with unready status: [manager]'
+    reason: ContainersNotReady
+    status: "False"
+    type: Ready
+  - lastProbeTime: null
+    lastTransitionTime: "2021-11-16T14:40:43Z"
+    message: 'containers with unready status: [manager]'
+    reason: ContainersNotReady
+    status: "False"
+    type: ContainersReady
+  - lastProbeTime: null
+    lastTransitionTime: "2021-11-16T14:40:43Z"
+    status: "True"
+    type: PodScheduled
+  containerStatuses:
+  - containerID: docker://7e255c9aa953325373f05e4c5cbb6b465be08c9762eeda7f9294b749b83fc867
+    image: mcr.microsoft.com/oss/open-policy-agent/gatekeeper:v3.2.3
+    imageID: docker-pullable://mcr.microsoft.com/oss/open-policy-agent/gatekeeper@sha256:47160cfae0cbc28e6ca0961c5e5a63ff04e6509b112341c7d59bf5216956ee79
+    lastState:
+      terminated:
+        containerID: docker://7e255c9aa953325373f05e4c5cbb6b465be08c9762eeda7f9294b749b83fc867
+        exitCode: 128
+        finishedAt: "2021-11-16T14:44:31Z"
+        message: 'OCI runtime create failed: container_linux.go:380: starting container
+          process caused: process_linux.go:545: container init caused: process_linux.go:508:
+          setting cgroup config for procHooks process caused: failed to write "300000":
+          write /sys/fs/cgroup/cpu/kubepods/burstable/podf897f9d4-01e9-4f59-9941-4af5e204ff65/7e255c9aa953325373f05e4c5cbb6b465be08c9762eeda7f9294b749b83fc867/cpu.cfs_quota_us:
+          invalid argument: unknown'
+        reason: ContainerCannotRun
+        startedAt: "2021-11-16T14:44:31Z"
+    name: manager
+    ready: false
+    restartCount: 5
+    started: false
+    state:
+      waiting:
+        message: back-off 2m40s restarting failed container=manager pod=gatekeeper-audit-74cd7c4844-7qp59_gatekeeper-system(f897f9d4-01e9-4f59-9941-4af5e204ff65)
+        reason: CrashLoopBackOff
+  hostIP: 192.168.49.2
+  phase: Running
+  podIP: 172.17.0.19
+  podIPs:
+  - ip: 172.17.0.19
+  qosClass: Burstable
+  startTime: "2021-11-16T14:40:43Z"
